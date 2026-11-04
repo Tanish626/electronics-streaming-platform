@@ -69,5 +69,22 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
       DYNAMIC_CONFIG_ENABLED: "false"
 
+  # S3-compatible object store. The image runs `weed mini -dir=/data` by default
+  # (master + volume + filer + S3 gateway + admin UI in one process).
+  # S3_BUCKET makes it create the bucket on startup.
+  seaweedfs:
+    image: chrislusf/seaweedfs:4.50
+    container_name: seaweedfs
+    ports:
+      - "${S3_API_PORT:-8333}:8333"
+      - "${S3_ADMIN_UI_PORT:-23646}:23646"
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-lakeadmin}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-lakesecret123}
+      S3_BUCKET: ${LAKE_BUCKET:-lakehouse}
+    volumes:
+      - seaweedfs_data:/data
+
 volumes:
   kafka_data:
+  seaweedfs_data:
