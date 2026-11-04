@@ -1,0 +1,17 @@
+# secrets / local config
+.env
+
+# python
+.venv/
+__pycache__/
+*.pyc
+
+# local data and logs
+data/
+*.log
+
+# editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
