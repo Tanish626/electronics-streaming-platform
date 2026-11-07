@@ -85,6 +85,29 @@ services:
     volumes:
       - seaweedfs_data:/data
 
+  # Spark in local mode. Idle container: jobs are launched with `docker compose exec`
+  # (and later as their own streaming service). Job code is mounted from ./spark/jobs.
+  spark:
+    build: ./spark
+    image: electronics-spark:3.5.3
+    container_name: spark
+    depends_on:
+      kafka:
+        condition: service_healthy
+      seaweedfs:
+        condition: service_started
+    command: ["sleep", "infinity"]
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      S3_ENDPOINT: http://seaweedfs:8333
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-lakeadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-lakesecret123}
+      LAKE_BUCKET: ${LAKE_BUCKET:-lakehouse}
+    volumes:
+      - ./spark/jobs:/opt/app:ro
+      - spark_ivy:/opt/ivy
+
 volumes:
   kafka_data:
   seaweedfs_data:
+  spark_ivy:
